@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Sitemap: https://list.tsserver.ir/sitemap.xml
+
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1

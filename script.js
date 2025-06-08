@@ -574,10 +574,10 @@ class SEOManager {
     }
 
     updatePageTitle() {
-        const onlineCount = serversData.filter(s => s.status === 'online').length;
-        const totalCount = serversData.length;
+        // const onlineCount = serversData.filter(s => s.status === 'online').length;
+        // const totalCount = serversData.length;
         
-        document.title = `${onlineCount} سرور آنلاین از ${totalCount} سرور | لیست برترین سرورهای تیم اسپیک ایران`;
+        // document.title = `${onlineCount} سرور آنلاین از ${totalCount} سرور | لیست برترین سرورهای تیم اسپیک ایران`;
     }
 
     setupStructuredData() {
