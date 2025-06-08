@@ -1,4 +1,3 @@
-// Sample TeamSpeak Server Data
 const serversData = [
     {
         name: "تهران تی اس",
@@ -20,6 +19,13 @@ const serversData = [
         maxUsers: 512,
         status: "online",
         description: "یکی از قدیمی ترین سرور های عمومی ایران"
+    },
+    {
+        name: "سلاطین گیم",
+        ip: "tssalatin.ir",
+        maxUsers: 1024,
+        status: "online",
+        description: "یکی از قدیمی ترین سرور های عمومی ایران - فروشنده سرور های تیم اسپیک"
     },
     {
         name: "تیم اسپیک آسمان",
