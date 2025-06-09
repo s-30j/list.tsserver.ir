@@ -142,7 +142,7 @@ class ServerManager {
         });
 
         // Refresh servers every 5 minutes
-        setInterval(() => this.refreshServers(), 300000);
+        // setInterval(() => this.refreshServers(), 300000);
     }
 
     handleSearch(query) {
@@ -212,18 +212,18 @@ class ServerManager {
     }
 
     async refreshServers() {
-        // Simulate server status updates
-        serversData.forEach(server => {
-            if (Math.random() < 0.1) { // 10% chance to change status
-                server.status = server.status === 'online' ? 'offline' : 'online';
-            } else if (server.status === 'online') {
-                // Slight variation in user count
-            }
-        });
+        // // Simulate server status updates
+        // serversData.forEach(server => {
+        //     if (Math.random() < 0.1) { // 10% chance to change status
+        //         server.status = server.status === 'online' ? 'offline' : 'online';
+        //     } else if (server.status === 'online') {
+        //         // Slight variation in user count
+        //     }
+        // });
 
-        currentServers = [...serversData];
-        this.renderServers();
-        this.updateStats();
+        // currentServers = [...serversData];
+        // this.renderServers();
+        // this.updateStats();
     }
 
     renderServers() {
@@ -575,8 +575,8 @@ class SEOManager {
     }
 
     init() {
-        this.updatePageTitle();
-        this.setupStructuredData();
+        // this.updatePageTitle();
+        // this.setupStructuredData();
     }
 
     updatePageTitle() {
