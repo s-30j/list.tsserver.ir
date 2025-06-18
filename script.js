@@ -15,7 +15,7 @@ const serversData = [
     },
     {
         name: "تکنولوژیست",
-        ip: "tssv.ir",
+        ip: "tcnl.ir",
         maxUsers: 16536,
         status: "online",
         description: "سرور عمومی، پیشرفته ترین سرور تیم اسپیکی جهان"
