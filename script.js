@@ -14,6 +14,13 @@ const serversData = [
         description: "یکی از قدیمی ترین سرور های عمومی ایران"
     },
     {
+        name: "تکنولوژیست",
+        ip: "tssv.ir",
+        maxUsers: 16536,
+        status: "online",
+        description: "سرور عمومی، پیشرفته ترین سرور تیم اسپیکی جهان"
+    },
+    {
         name: "تیم اسپیک سرور",
         ip: "tsserver.ir",
         maxUsers: 512,
