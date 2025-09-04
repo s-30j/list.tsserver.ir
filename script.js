@@ -63,6 +63,13 @@ const serversData = [
         description: "فروش و خدمات سرور های تیم اسپیک و گیمینگ"
     },
     {
+        name: "سرور تیم اسپیک یونیتی",
+        ip: "rogclan.ir",
+        maxUsers: 128,
+        status: "online",
+        description: "سرور تیم اسپیک یونیتی"
+    },
+    {
         name: "تیم اسپیک زولا بازان - فالن گیم",
         ip: "zulats.ir",
         maxUsers: 1024,
