@@ -56,6 +56,13 @@ const serversData = [
         description: "بزرگ ترین فروشنده سرور های تیم اسپیک"
     },
     {
+        name: "ایکس گیمینگ",
+        ip: "freets.ir",
+        maxUsers: 1000,
+        status: "online",
+        description: "ارائه دهنده خدمات هاستینگ"
+    },
+    {
         name: "فالن گیم",
         ip: "fallents.ir",
         maxUsers: 1024,
