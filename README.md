@@ -15,7 +15,3 @@
 - سئوی بهینه
 - دسترسی‌پذیری (Accessibility)
 - PWA و نصب روی موبایل
-
-## مشارکت
-
-برای اضافه کردن سرور جدید، [اینجا](https://github.com/30j/list.tsserver.ir/issues/new?template=add-server.yml) یک Issue باز کنید.
