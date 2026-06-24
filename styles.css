@@ -1,7 +1,7 @@
 /* Custom Font */
 @font-face {
     font-family: 'SoftNum';
-    src: url('https://vitamin-bourse.ir/asset/soft_num.ttf') format('truetype');
+    src: url('soft_num.ttf') format('truetype');
     font-display: swap;
 }
 
