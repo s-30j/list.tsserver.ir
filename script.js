@@ -1,714 +1,257 @@
-const serversData = [
-    {
-        name: "تهران تی اس",
-        ip: "tehrants.ir",
-        maxUsers: 500,
-        status: "online",
-        description: "قدیمی ترین سرور عمومی کشور"
-    },
-    {
-        name: "تیم اسپیک سرور",
-        ip: "tssv.ir",
-        maxUsers: 512,
-        status: "online",
-        description: "یکی از قدیمی ترین سرور های عمومی ایران"
-    },
-    {
-        name: "تکنولوژیست",
-        ip: "tcnl.ir",
-        maxUsers: 16536,
-        status: "online",
-        description: "سرور عمومی، پیشرفته ترین سرور تیم اسپیکی جهان"
-    },
-    {
-        name: "تیم اسپیک سرور",
-        ip: "tsserver.ir",
-        maxUsers: 512,
-        status: "online",
-        description: "یکی از قدیمی ترین سرور های عمومی ایران"
-    },
-    {
-        name: "سلاطین گیم",
-        ip: "tssalatin.ir",
-        maxUsers: 1024,
-        status: "online",
-        description: "یکی از قدیمی ترین سرور های عمومی ایران - فروشنده سرور های تیم اسپیک"
-    },
-    {
-        name: "تیم اسپیک آسمان",
-        ip: "tssky.ir",
-        maxUsers: 400,
-        status: "online",
-        description: "یکی از قدیمی ترین سرور های عمومی ایران"
-    },
-    {
-        name: "تهران‌گیمینگ",
-        ip: "tgts.ir",
-        maxUsers: 256,
-        status: "online",
-        description: "برترین فروشنده تمامی خدمات تیم‌اسپیک و سرور مجازی گیم"
-    },
-    {
-        name: "ندیکس",
-        ip: "nxts.ir",
-        maxUsers: 8585,
-        status: "online",
-        description: "بزرگ ترین فروشنده سرور های تیم اسپیک"
-    },
-    {
-        name: "ایکس گیمینگ",
-        ip: "freets.ir",
-        maxUsers: 1000,
-        status: "online",
-        description: "ارائه دهنده خدمات هاستینگ"
-    },
-    {
-        name: "فالن گیم",
-        ip: "fallents.ir",
-        maxUsers: 1024,
-        status: "online",
-        description: "فروش و خدمات سرور های تیم اسپیک و گیمینگ"
-    },
-    {
-        name: "سرور تیم اسپیک یونیتی",
-        ip: "rogclan.ir",
-        maxUsers: 128,
-        status: "online",
-        description: "سرور تیم اسپیک یونیتی"
-    },
-    {
-        name: "تیم اسپیک زولا بازان - فالن گیم",
-        ip: "zulats.ir",
-        maxUsers: 1024,
-        status: "online",
-        description: "فروش و خدمات سرور های تیم اسپیک و گیمینگ"
-    },
-    {
-        name: "تیم اسپیک آی آر",
-        ip: "teamspeak.ir",
-        maxUsers: 1024,
-        status: "offline",
-        description: "parsvds.com فروش و خدمات سرور مجازی و اختصاصی"
-    }
-    
-];
+let data = [], cur = [], sort = { col: null, dir: 'asc' };
 
-// Global variables
-let currentServers = [...serversData];
-let currentSort = { column: null, direction: 'asc' };
-
-// Theme Management
-class ThemeManager {
+class Theme {
     constructor() {
-        this.theme = localStorage.getItem('theme') || 'dark';
-        this.themeToggle = document.getElementById('themeToggle');
-        this.init();
+        this.theme = localStorage.getItem('t') || 'dark';
+        this.btn = document.getElementById('themeToggle');
+        this.set(this.theme);
+        this.btn.addEventListener('click', () => this.toggle());
     }
-
-    init() {
-        this.setTheme(this.theme);
-        this.themeToggle.addEventListener('click', () => this.toggleTheme());
+    set(t) {
+        this.theme = t;
+        document.documentElement.setAttribute('data-theme', t);
+        localStorage.setItem('t', t);
+        this.btn.querySelector('.icon').textContent = t === 'dark' ? '☀️' : '🌙';
+        this.btn.setAttribute('aria-label', t === 'dark' ? 'تم روشن' : 'تم تاریک');
     }
-
-    setTheme(theme) {
-        this.theme = theme;
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-        
-        const themeIcon = this.themeToggle.querySelector('.theme-icon');
-        themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
-        this.themeToggle.setAttribute('aria-label', 
-            theme === 'dark' ? 'تغییر به تم روشن' : 'تغییر به تم تاریک'
-        );
-    }
-
-    toggleTheme() {
-        const newTheme = this.theme === 'dark' ? 'light' : 'dark';
-        this.setTheme(newTheme);
-    }
+    toggle() { this.set(this.theme === 'dark' ? 'light' : 'dark'); }
 }
 
-// Server Management
-class ServerManager {
+class Server {
     constructor() {
-        this.serversTableBody = document.getElementById('serversTableBody');
-        this.searchInput = document.getElementById('searchInput');
-        this.searchButton = document.getElementById('searchButton');
-        this.loadingState = document.getElementById('loadingState');
-        this.emptyState = document.getElementById('emptyState');
-        this.init();
+        this.body = document.getElementById('serversBody');
+        this.sel = document.getElementById('searchInput');
+        this.sbtn = document.getElementById('searchButton');
+        this.load = document.getElementById('loading');
+        this.empty = document.getElementById('empty');
+        this.skel = document.getElementById('skel');
+        this._ready = this.init();
     }
-
-    init() {
-        this.setupEventListeners();
-        this.loadServers();
-        this.updateStats();
+    async init() {
+        this.events();
+        await this.fetch();
+        setInterval(() => this.fetch(), 300000);
     }
+    ready() { return this._ready; }
 
-    setupEventListeners() {
-        // Search functionality
-        this.searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
-        this.searchButton.addEventListener('click', () => this.handleSearch(this.searchInput.value));
-        
-        // Enter key for search
-        this.searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.handleSearch(this.searchInput.value);
-            }
+    events() {
+        const d = U.debounce(v => this.go(v), 260);
+        this.sel.addEventListener('input', e => d(e.target.value));
+        this.sbtn.addEventListener('click', () => this.go(this.sel.value));
+        this.sel.addEventListener('keypress', e => { if (e.key === 'Enter') this.go(this.sel.value); });
+        document.querySelectorAll('.sort').forEach(th => {
+            th.addEventListener('click', () => this.sort(th.dataset.sort));
         });
-
-        // Table sorting
-        document.querySelectorAll('.sortable').forEach(header => {
-            header.addEventListener('click', () => this.handleSort(header.dataset.sort));
-        });
-
-        // Refresh servers every 5 minutes
-        // setInterval(() => this.refreshServers(), 300000);
     }
 
-    handleSearch(query) {
-        const filteredServers = serversData.filter(server => 
-            server.name.toLowerCase().includes(query.toLowerCase()) ||
-            server.ip.toLowerCase().includes(query.toLowerCase()) ||
-            server.description.toLowerCase().includes(query.toLowerCase())
+    go(q) {
+        const s = q.toLowerCase();
+        cur = data.filter(v =>
+            v.name.toLowerCase().includes(s) ||
+            v.ip.toLowerCase().includes(s) ||
+            v.description.toLowerCase().includes(s)
         );
-        
-        currentServers = filteredServers;
-        this.renderServers();
-        this.updateStats();
+        this.render();
+        this.stats();
     }
 
-    handleSort(column) {
-        const header = document.querySelector(`[data-sort="${column}"]`);
-        
-        // Clear other headers
-        document.querySelectorAll('.sortable').forEach(h => {
-            if (h !== header) {
-                h.classList.remove('sort-asc', 'sort-desc');
-            }
+    sort(col) {
+        const th = document.querySelector(`[data-sort="${col}"]`);
+        document.querySelectorAll('.sort').forEach(h => { if (h !== th) { h.classList.remove('asc', 'desc'); } });
+        const dir = sort.col === col && sort.dir === 'asc' ? 'desc' : 'asc';
+        sort = { col, dir };
+        th.classList.remove('asc', 'desc');
+        th.classList.add(dir);
+        cur.sort((a, b) => {
+            let va = a[col], vb = b[col];
+            if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+            return dir === 'asc' ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
         });
-
-        // Determine sort direction
-        let direction = 'asc';
-        if (currentSort.column === column) {
-            direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-        }
-
-        currentSort = { column, direction };
-
-        // Update header class
-        header.classList.remove('sort-asc', 'sort-desc');
-        header.classList.add(direction === 'asc' ? 'sort-asc' : 'sort-desc');
-
-        // Sort servers
-        currentServers.sort((a, b) => {
-            let aVal = a[column];
-            let bVal = b[column];
-
-            // Handle different data types
-            if (typeof aVal === 'string') {
-                aVal = aVal.toLowerCase();
-                bVal = bVal.toLowerCase();
-            }
-
-            if (direction === 'asc') {
-                return aVal > bVal ? 1 : -1;
-            } else {
-                return aVal < bVal ? 1 : -1;
-            }
-        });
-
-        this.renderServers();
+        this.render();
     }
 
-    async loadServers() {
-        this.showLoading();
-        
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        currentServers = [...serversData];
-        this.renderServers();
-        this.hideLoading();
+    async fetch() {
+        this.showLoad();
+        try {
+            const r = await fetch('servers.json');
+            if (!r.ok) throw Error();
+            data = await r.json();
+            cur = [...data];
+            this.render();
+            this.stats();
+        } catch (e) { this.empty.style.display = 'block'; }
+        finally { this.hideLoad(); }
     }
 
-    async refreshServers() {
-        // // Simulate server status updates
-        // serversData.forEach(server => {
-        //     if (Math.random() < 0.1) { // 10% chance to change status
-        //         server.status = server.status === 'online' ? 'offline' : 'online';
-        //     } else if (server.status === 'online') {
-        //         // Slight variation in user count
-        //     }
-        // });
-
-        // currentServers = [...serversData];
-        // this.renderServers();
-        // this.updateStats();
-    }
-
-    renderServers() {
-        if (currentServers.length === 0) {
-            this.showEmptyState();
-            return;
-        }
-
-        this.hideEmptyState();
-
-        const tbody = this.serversTableBody;
-        tbody.innerHTML = '';
-
-        currentServers.forEach((server, index) => {
-            const row = this.createServerRow(server, index);
-            tbody.appendChild(row);
-        });
-
-        // Add animation to new rows
-        this.animateRows();
-    }
-
-    createServerRow(server, index) {
-        const row = document.createElement('tr');
-        row.setAttribute('role', 'row');
-        row.style.opacity = '0';
-        row.style.transform = 'translateY(20px)';
-
-        const statusClass = this.getStatusClass(server.status);
-        const statusText = this.getStatusText(server.status);
-        
-        row.innerHTML = `
-            <td data-label="نام سرور">
-                <strong>${this.escapeHtml(server.name)}</strong>
-                <br>
-                <small style="color: var(--text-muted);">${this.escapeHtml(server.description)}</small>
-            </td>
-            <td data-label="آدرس سرور">
-                <code style="background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; font-family: monospace;">
-                    ${this.escapeHtml(server.ip)}
-                </code>
-            </td>
-            <td data-label="حداکثر کاربران">
-                <span style="color: var(--text-secondary);">
-                    ${server.maxUsers}
-                </span>
-            </td>
-            <td data-label="وضعیت">
-                <span class="status-badge ${statusClass}">
-                    ${statusText}
-                </span>
-            </td>
-            <td data-label="اتصال">
-                <a href="ts3server://${server.ip}"
-                   class="connect-btn" 
-                   title="اتصال به سرور ${this.escapeHtml(server.name)}"
-                   ${server.status !== 'online' ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>
-                    اتصال
-                </a>
-            </td>
-        `;
-
-        return row;
-    }
-
-    animateRows() {
-        const rows = this.serversTableBody.querySelectorAll('tr');
-        rows.forEach((row, index) => {
+    render() {
+        if (!cur.length) { this.empty.style.display = 'block'; this.body.innerHTML = ''; return; }
+        this.empty.style.display = 'none';
+        this.body.innerHTML = '';
+        cur.forEach((s, i) => {
+            const tr = document.createElement('tr');
+            tr.style.opacity = '0';
+            tr.style.transform = 'translateY(10px)';
+            const st = s.status === 'online' ? 's-online' : s.status === 'offline' ? 's-offline' : '';
+            const lb = s.status === 'online' ? 'آنلاین' : s.status === 'offline' ? 'آفلاین' : 'نامشخص';
+            const ip = this.esc(s.ip);
+            tr.innerHTML =
+                `<td><div class="sv-name">${this.esc(s.name)}</div><small class="sv-desc">${this.esc(s.description)}</small></td>` +
+                `<td class="ip-cell"><div class="ip-box"><span class="ip-txt">${ip}</span><button class="cpy" data-ip="${ip}" aria-label="کپی">📋</button></div></td>` +
+                `<td><span class="ucnt">${s.maxUsers}</span></td>` +
+                `<td><span class="sbadge ${st}">${lb}</span></td>` +
+                `<td><a href="ts3server://${ip}" class="cn"${s.status !== 'online' ? ' disabled' : ''}><span>اتصال</span></a></td>`;
+            this.body.appendChild(tr);
             setTimeout(() => {
-                row.style.transition = 'all 0.3s ease';
-                row.style.opacity = '1';
-                row.style.transform = 'translateY(0)';
-            }, index * 50);
+                tr.style.transition = 'opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                tr.style.opacity = '1';
+                tr.style.transform = 'translateY(0)';
+            }, 30 + i * 30);
         });
     }
 
-    getStatusClass(status) {
-        switch (status) {
-            case 'online': return 'status-online';
-            case 'offline': return 'status-offline';
-            default: return 'status-unknown';
-        }
+    showLoad() {
+        this.skel.classList.add('on');
+        this.load.style.display = 'block';
+        this.empty.style.display = 'none';
+        this.body.style.display = 'none';
+    }
+    hideLoad() {
+        this.skel.classList.remove('on');
+        this.load.style.display = 'none';
+        this.body.style.display = '';
     }
 
-    getStatusText(status) {
-        switch (status) {
-            case 'online': return 'آنلاین';
-            case 'offline': return 'آفلاین';
-            default: return 'نامشخص';
-        }
+    stats() {
+        this.anim('totalServers', data.length);
+        this.anim('onlineServers', data.filter(s => s.status === 'online').length);
     }
 
-    showLoading() {
-        this.loadingState.style.display = 'block';
-        // this.serversTableBody.parentElement.style.display = 'none';
-        this.emptyState.style.display = 'none';
-    }
-
-    hideLoading() {
-        this.loadingState.style.display = 'none';
-        // this.serversTableBody.parentElement.style.display = 'block';
-    }
-
-    showEmptyState() {
-        this.emptyState.style.display = 'block';
-        // this.serversTableBody.parentElement.style.display = 'none';
-    }
-
-    hideEmptyState() {
-        this.emptyState.style.display = 'none';
-        // this.serversTableBody.parentElement.style.display = 'block';
-    }
-
-    updateStats() {
-        const totalServers = serversData.length;
-        const onlineServers = serversData.filter(s => s.status === 'online').length;
-
-        this.animateCounter('totalServers', totalServers);
-        this.animateCounter('onlineServers', onlineServers);
-    }
-
-    animateCounter(elementId, targetValue) {
-        const element = document.getElementById(elementId);
-        const startValue = parseInt(element.textContent) || 0;
-        const duration = 1000;
-        const startTime = performance.now();
-
-        const animate = (currentTime) => {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            
-            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-            const currentValue = Math.floor(startValue + (targetValue - startValue) * easeOutQuart);
-            
-            element.textContent = currentValue.toLocaleString('fa-IR');
-            
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            }
+    anim(id, target) {
+        const el = document.getElementById(id);
+        const start = parseInt(el.textContent) || 0;
+        const dur = 900;
+        const t0 = performance.now();
+        const tick = (now) => {
+            const p = Math.min((now - t0) / dur, 1);
+            const e = 1 - Math.pow(1 - p, 3);
+            el.textContent = Math.floor(start + (target - start) * e).toLocaleString('fa-IR');
+            if (p < 1) requestAnimationFrame(tick);
         };
-
-        requestAnimationFrame(animate);
+        requestAnimationFrame(tick);
     }
 
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+    esc(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+}
+
+class U {
+    static debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+    static copy(text) {
+        if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0;left:-9999px';
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        return new Promise((res, rej) => { document.execCommand('copy') ? res() : rej(); ta.remove(); });
     }
 }
 
-// Utility Functions
-class Utils {
-    static formatNumber(num) {
-        return num.toLocaleString('fa-IR');
-    }
-
-    static debounce(func, delay) {
-        let timeoutId;
-        return function (...args) {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
-
-    static throttle(func, limit) {
-        let inThrottle;
-        return function () {
-            const args = arguments;
-            const context = this;
-            if (!inThrottle) {
-                func.apply(context, args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        };
-    }
-
-    static copyToClipboard(text) {
-        if (navigator.clipboard && window.isSecureContext) {
-            return navigator.clipboard.writeText(text);
-        } else {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'absolute';
-            textArea.style.opacity = '0';
-            textArea.style.left = '-999999px';
-            textArea.style.top = '-999999px';
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            return new Promise((resolve, reject) => {
-                document.execCommand('copy') ? resolve() : reject();
-                textArea.remove();
-            });
-        }
-    }
-}
-
-// Performance Monitoring
-class PerformanceMonitor {
+class Acc {
     constructor() {
-        this.metrics = {
-            loadTime: 0,
-            renderTime: 0,
-            searchTime: 0
-        };
-        this.init();
-    }
-
-    init() {
-        this.measureLoadTime();
-        this.setupPerformanceObserver();
-    }
-
-    measureLoadTime() {
-        window.addEventListener('load', () => {
-            const loadTime = performance.now();
-            this.metrics.loadTime = loadTime;
-            console.log(`صفحه در ${Math.round(loadTime)}ms بارگذاری شد`);
+        document.addEventListener('keydown', e => {
+            const row = e.target.closest('tr');
+            if (!row) return;
+            const t = e.key === 'ArrowDown' ? row.nextElementSibling : e.key === 'ArrowUp' ? row.previousElementSibling : null;
+            if (t) { e.preventDefault(); t.focus(); }
         });
-    }
-
-    setupPerformanceObserver() {
-        if ('PerformanceObserver' in window) {
-            const observer = new PerformanceObserver((list) => {
-                for (const entry of list.getEntries()) {
-                    if (entry.entryType === 'measure') {
-                        console.log(`${entry.name}: ${Math.round(entry.duration)}ms`);
-                    }
-                }
-            });
-            observer.observe({ entryTypes: ['measure'] });
-        }
-    }
-
-    startMeasure(name) {
-        performance.mark(`${name}-start`);
-    }
-
-    endMeasure(name) {
-        performance.mark(`${name}-end`);
-        performance.measure(name, `${name}-start`, `${name}-end`);
     }
 }
 
-// Error Handling
-class ErrorHandler {
-    constructor() {
-        this.init();
-    }
-
+class SEO {
     init() {
-        window.addEventListener('error', (event) => {
-            this.logError('JavaScript Error', event.error);
-        });
-
-        window.addEventListener('unhandledrejection', (event) => {
-            this.logError('Unhandled Promise Rejection', event.reason);
-        });
-    }
-
-    logError(type, error) {
-        console.error(`${type}:`, error);
-        
-        // در محیط production می‌توانید این اطلاعات را به سرور ارسال کنید
-        if (window.location.hostname !== 'localhost') {
-            this.reportError(type, error);
-        }
-    }
-
-    reportError(type, error) {
-        // ارسال خطا به سرور لاگ
-        const errorData = {
-            type: type,
-            message: error.message || error.toString(),
-            stack: error.stack,
-            url: window.location.href,
-            userAgent: navigator.userAgent,
-            timestamp: new Date().toISOString()
-        };
-
-        // در اینجا می‌توانید خطا را به سرویس لاگ ارسال کنید
-        console.log('Error reported:', errorData);
-    }
-}
-
-// Accessibility Features
-class AccessibilityManager {
-    constructor() {
-        this.init();
-    }
-
-    init() {
-        this.setupKeyboardNavigation();
-        this.setupScreenReaderSupport();
-        this.setupHighContrastMode();
-    }
-
-    setupKeyboardNavigation() {
-        // اضافه کردن پشتیبانی از کیبورد برای جدول
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'TR' || e.target.closest('tr')) {
-                const currentRow = e.target.closest('tr');
-                let targetRow = null;
-
-                switch (e.key) {
-                    case 'ArrowDown':
-                        targetRow = currentRow.nextElementSibling;
-                        break;
-                    case 'ArrowUp':
-                        targetRow = currentRow.previousElementSibling;
-                        break;
-                }
-
-                if (targetRow) {
-                    e.preventDefault();
-                    targetRow.focus();
-                }
-            }
-        });
-    }
-
-    setupScreenReaderSupport() {
-        // اضافه کردن توضیحات برای screen reader ها
-        const table = document.getElementById('serversTable');
-        if (table) {
-            table.setAttribute('aria-describedby', 'table-description');
-            
-            const description = document.createElement('div');
-            description.id = 'table-description';
-            description.className = 'sr-only';
-            table.parentNode.insertBefore(description, table);
-        }
-    }
-
-    setupHighContrastMode() {
-        // تشخیص حالت high contrast
-        if (window.matchMedia('(prefers-contrast: high)').matches) {
-            document.body.classList.add('high-contrast');
-        }
-    }
-}
-
-// SEO and Analytics
-class SEOManager {
-    constructor() {
-        this.init();
-    }
-
-    init() {
-        // this.updatePageTitle();
-        // this.setupStructuredData();
-    }
-
-    updatePageTitle() {
-        // const onlineCount = serversData.filter(s => s.status === 'online').length;
-        // const totalCount = serversData.length;
-        
-        // document.title = `${onlineCount} سرور آنلاین از ${totalCount} سرور | لیست برترین سرورهای تیم اسپیک ایران`;
-    }
-
-    setupStructuredData() {
-        const structuredData = {
+        if (!data.length) return;
+        const el = document.createElement('script');
+        el.type = 'application/ld+json';
+        el.textContent = JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "لیست برترین سرور های تیم اسپیک ایران",
-            "description": "لیست کامل و بروز برترین سرور های تیم اسپیک ایران",
-            "url": window.location.href,
+            "name": "بهترین سرورهای تیم اسپیک ایران",
             "mainEntity": {
                 "@type": "ItemList",
-                "numberOfItems": serversData.length,
-                "itemListElement": serversData.map((server, index) => ({
-                    "@type": "ListItem",
-                    "position": index + 1,
-                    "item": {
-                        "@type": "SoftwareApplication",
-                        "name": server.name,
-                        "description": server.description,
-                        "url": `ts3server://${server.ip}`,
-                        "applicationCategory": "CommunicationApplication"
-                    }
+                "numberOfItems": data.length,
+                "itemListElement": data.map((s, i) => ({
+                    "@type": "ListItem", "position": i + 1,
+                    "item": { "@type": "SoftwareApplication", "name": s.name, "description": s.description }
                 }))
             }
-        };
-
-        const script = document.createElement('script');
-        script.type = 'application/ld+json';
-        script.textContent = JSON.stringify(structuredData);
-        document.head.appendChild(script);
-    }
-}
-
-// Main Application
-class TeamSpeakApp {
-    constructor() {
-        this.themeManager = new ThemeManager();
-        this.serverManager = new ServerManager();
-        this.performanceMonitor = new PerformanceMonitor();
-        this.errorHandler = new ErrorHandler();
-        this.accessibilityManager = new AccessibilityManager();
-        this.seoManager = new SEOManager();
-        
-        this.init();
-    }
-
-    init() {
-        this.performanceMonitor.startMeasure('app-initialization');
-        
-        // اضافه کردن event listener برای copy کردن آدرس سرور
-        document.addEventListener('click', (e) => {
-            if (e.target.tagName === 'CODE' && e.target.textContent.includes(':')) {
-                Utils.copyToClipboard(e.target.textContent)
-                    .then(() => {
-                        this.showNotification('آدرس سرور کپی شد!', 'success');
-                    })
-                    .catch(() => {
-                        this.showNotification('خطا در کپی کردن آدرس', 'error');
-                    });
-            }
         });
-
-        this.performanceMonitor.endMeasure('app-initialization');
-    }
-
-    showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: 2px solid var(--border-color);
-            box-shadow: 0 4px 15px var(--shadow-color);
-            z-index: 1000;
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: all 0.3s ease;
-        `;
-
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.style.opacity = '1';
-            notification.style.transform = 'translateY(0)';
-        }, 10);
-
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            notification.style.transform = 'translateY(-20px)';
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
+        document.head.appendChild(el);
     }
 }
 
-// Initialize Application
-document.addEventListener('DOMContentLoaded', () => {
-    const app = new TeamSpeakApp();
-    
-    // Global app reference for debugging
-    window.TeamSpeakApp = app;
-});
+class FAQ {
+    constructor() {
+        document.querySelectorAll('.faq-q').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.faq-item');
+                const open = item.classList.contains('open');
+                document.querySelectorAll('.faq-item.open').forEach(el => {
+                    el.classList.remove('open');
+                    el.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+                });
+                if (!open) { item.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
+            });
+        });
+    }
+}
+
+class Reveal {
+    constructor() {
+        if (!('IntersectionObserver' in window)) {
+            document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+            return;
+        }
+        const o = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); o.unobserve(e.target); } });
+        }, { threshold: 0.04, rootMargin: '0px 0px -20px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => o.observe(el));
+    }
+}
+
+class App {
+    constructor() {
+        new Theme();
+        this.srv = new Server();
+        new Acc();
+        this.seo = new SEO();
+        new FAQ();
+        new Reveal();
+        this.copy();
+    }
+
+    copy() {
+        document.addEventListener('click', e => {
+            const btn = e.target.closest('.cpy');
+            if (!btn) return;
+            U.copy(btn.dataset.ip).then(() => {
+                btn.textContent = '✓';
+                btn.classList.add('done');
+                this.toast('کپی شد ✓');
+                setTimeout(() => { btn.textContent = '📋'; btn.classList.remove('done'); }, 1600);
+            }).catch(() => this.toast('خطا'));
+        });
+        this.srv.ready().then(() => this.seo.init());
+    }
+
+    toast(msg) {
+        const el = document.createElement('div');
+        el.className = 'toast';
+        el.textContent = msg;
+        document.body.appendChild(el);
+        requestAnimationFrame(() => el.classList.add('show'));
+        setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 400); }, 2600);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => { window.app = new App(); });

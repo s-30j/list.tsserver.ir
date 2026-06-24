@@ -1,0 +1,93 @@
+[
+    {
+        "name": "تهران تی اس",
+        "ip": "tehrants.ir",
+        "maxUsers": 500,
+        "status": "online",
+        "description": "قدیمی ترین سرور عمومی کشور"
+    },
+    {
+        "name": "تیم اسپیک سرور",
+        "ip": "tssv.ir",
+        "maxUsers": 512,
+        "status": "online",
+        "description": "یکی از قدیمی ترین سرور های عمومی ایران"
+    },
+    {
+        "name": "تکنولوژیست",
+        "ip": "tcnl.ir",
+        "maxUsers": 16536,
+        "status": "online",
+        "description": "سرور عمومی، پیشرفته ترین سرور تیم اسپیکی جهان"
+    },
+    {
+        "name": "تیم اسپیک سرور",
+        "ip": "tsserver.ir",
+        "maxUsers": 512,
+        "status": "online",
+        "description": "یکی از قدیمی ترین سرور های عمومی ایران"
+    },
+    {
+        "name": "سلاطین گیم",
+        "ip": "tssalatin.ir",
+        "maxUsers": 1024,
+        "status": "online",
+        "description": "یکی از قدیمی ترین سرور های عمومی ایران - فروشنده سرور های تیم اسپیک"
+    },
+    {
+        "name": "تیم اسپیک آسمان",
+        "ip": "tssky.ir",
+        "maxUsers": 400,
+        "status": "online",
+        "description": "یکی از قدیمی ترین سرور های عمومی ایران"
+    },
+    {
+        "name": "تهران‌گیمینگ",
+        "ip": "tgts.ir",
+        "maxUsers": 256,
+        "status": "online",
+        "description": "برترین فروشنده تمامی خدمات تیم‌اسپیک و سرور مجازی گیم"
+    },
+    {
+        "name": "ندیکس",
+        "ip": "nxts.ir",
+        "maxUsers": 8585,
+        "status": "online",
+        "description": "بزرگ ترین فروشنده سرور های تیم اسپیک"
+    },
+    {
+        "name": "ایکس گیمینگ",
+        "ip": "freets.ir",
+        "maxUsers": 1000,
+        "status": "online",
+        "description": "ارائه دهنده خدمات هاستینگ"
+    },
+    {
+        "name": "فالن گیم",
+        "ip": "fallents.ir",
+        "maxUsers": 1024,
+        "status": "online",
+        "description": "فروش و خدمات سرور های تیم اسپیک و گیمینگ"
+    },
+    {
+        "name": "سرور تیم اسپیک یونیتی",
+        "ip": "rogclan.ir",
+        "maxUsers": 128,
+        "status": "online",
+        "description": "سرور تیم اسپیک یونیتی"
+    },
+    {
+        "name": "تیم اسپیک زولا بازان - فالن گیم",
+        "ip": "zulats.ir",
+        "maxUsers": 1024,
+        "status": "online",
+        "description": "فروش و خدمات سرور های تیم اسپیک و گیمینگ"
+    },
+    {
+        "name": "تیم اسپیک آی آر",
+        "ip": "teamspeak.ir",
+        "maxUsers": 1024,
+        "status": "offline",
+        "description": "parsvds.com فروش و خدمات سرور مجازی و اختصاصی"
+    }
+]
